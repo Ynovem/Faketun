@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Faketun.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]")]
 public class InstructorController
 {
     private UnitOfWork _unitOfWork = new UnitOfWork();
@@ -26,7 +26,7 @@ public class InstructorController
             .First();
     }
 
-    [HttpGet("{id}/semester/{semesterid}", Name = "Subjects")]
+    [HttpGet("{id}/subjects/{semesterid}")]
     public IEnumerable<Subject>? Subjects(int id, int semesterid)
     {
         return _unitOfWork.SubjectRepository?.GetAll()
