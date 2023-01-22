@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Faketun;
 using Faketun.Models;
 using Microsoft.AspNetCore;
@@ -9,7 +10,12 @@ public class Program
         using (var db = new Context())
         {
             // Add Sample data
-            if (!db.Courses.Any())
+            if (!db.Courses.Any() &&
+                !db.Courses.Any() &&
+                !db.Departments.Any() &&
+                !db.Semesters.Any() &&
+                !db.Instructors.Any() &&
+                !db.Students.Any())
             {
                 var positions = new List<Position>
                 {
@@ -22,10 +28,7 @@ public class Program
                 };
                 db.Positions.AddRange(positions);
                 db.SaveChanges();
-            }
 
-            if (!db.Courses.Any())
-            {
                 var courses = new List<Course>
                 {
                     new Course() {Name = "Mérnökinformatikus Msc"},
@@ -36,10 +39,7 @@ public class Program
                 };
                 db.Courses.AddRange(courses);
                 db.SaveChanges();
-            }
 
-            if (!db.Departments.Any())
-            {
                 var departments = new List<Department>
                 {
                     new Department() {Name = "VIRT"},
@@ -48,22 +48,26 @@ public class Program
                 };
                 db.Departments.AddRange(departments);
                 db.SaveChanges();
-            }
 
-            if (!db.Semesters.Any())
-            {
-                db.Semesters.Add(new Semester()
+                var semesters = new List<Semester>
                 {
-                    Name = "2022/23/1",
-                    StartDate = new DateTime(2022, 9, 1),
-                    EndDate = new DateTime(2023, 01, 31)
-                });
+                    new Semester()
+                    {
+                        Name = "2022/23/1",
+                        StartDate = new DateTime(2022, 9, 1),
+                        EndDate = new DateTime(2023, 1, 31)
+                    },
+                    new Semester()
+                    {
+                        Name = "2022/23/2",
+                        StartDate = new DateTime(2023, 2, 1),
+                        EndDate = new DateTime(2023, 6, 30)
+                    }
+                };
+                db.Semesters.AddRange(semesters);
                 db.SaveChanges();
-            }
 
-            if (!db.Instructors.Any())
-            {
-                db.Instructors.AddRange(new List<Instructor>()
+                var instructors = new List<Instructor>()
                 {
                     new Instructor()
                     {
@@ -79,13 +83,11 @@ public class Program
                         Email = "instructor2@email",
                         Neptun = "INSTR2",
                     },
-                });
+                };
+                db.Instructors.AddRange(instructors);
                 db.SaveChanges();
-            }
 
-            if (!db.Students.Any())
-            {
-                db.Students.AddRange(new List<Student>()
+                var students = new List<Student>()
                 {
                     new Student()
                     {
@@ -101,14 +103,63 @@ public class Program
                         Course = db.Courses.Find(2),
                         Neptun = "STUDE2",
                     },
+                };
+                db.Students.AddRange(students);
+                db.SaveChanges();
+
+                db.Subjects.AddRange(new List<Subject>
+                {
+                    new Subject
+                    {
+                        Semester = semesters[0],
+                        Department = departments[0],
+                        Name = "Subject 1",
+                        Code = "Subj#1",
+                        Credit = 1,
+                        Instructors = new List<Instructor>{},
+                        Students = new List<Student>{},
+                    },
+                    new Subject
+                    {
+                        Semester = semesters[0],
+                        Department = departments[0],
+                        Name = "Subject 2",
+                        Code = "Subj#2",
+                        Credit = 2,
+                        Instructors = new List<Instructor>{instructors[0]},
+                        Students = new List<Student>{students[0]},
+                    },
+                    new Subject
+                    {
+                        Semester = semesters[0],
+                        Department = departments[0],
+                        Name = "Subject 3",
+                        Code = "Subj#3",
+                        Credit = 3,
+                        Instructors = new List<Instructor>{instructors[1]},
+                        Students = new List<Student>{students[1]},
+                    },
+                    new Subject
+                    {
+                        Semester = semesters[0],
+                        Department = departments[0],
+                        Name = "Subject 4",
+                        Code = "Subj#4",
+                        Credit = 4,
+                        Instructors = new List<Instructor>{instructors[0], instructors[1]},
+                        Students = new List<Student>{students[0], students[1]},
+                    },
                 });
                 db.SaveChanges();
             }
         }
         // CreateWebHostBuilder(args).Build().Run();
         var builder = WebApplication.CreateBuilder(args);
+
         // configure services
-        builder.Services.AddControllers();
+        builder.Services.AddControllers().AddJsonOptions(
+            x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
+        );
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>

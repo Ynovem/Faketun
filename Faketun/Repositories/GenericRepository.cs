@@ -5,7 +5,7 @@ namespace Faketun.Repositories;
 
 public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class, IEntity
 {
-    private readonly Context _db;
+    protected readonly Context _db;
 
     public GenericRepository(Context db)
     {

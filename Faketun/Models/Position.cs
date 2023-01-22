@@ -11,6 +11,6 @@ public class Position: IEntity
     public int Id { get; set; }
 
     public string Name { get; set; } = String.Empty;
-    
-    public List<Instructor> Instructors { get; set; }
+
+    public IList<Instructor> Instructors { get; set; } = new List<Instructor>();
 }

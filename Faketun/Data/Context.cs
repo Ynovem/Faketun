@@ -22,6 +22,21 @@ public class Context: DbContext
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Instructor>()
+            .HasOne(i => i.Position);
 
+        builder.Entity<Student>()
+            .HasOne(s => s.Course);
+
+        builder.Entity<Subject>()
+            .HasOne(s => s.Department);
+        builder.Entity<Subject>()
+            .HasOne(s => s.Semester);
+        builder.Entity<Subject>()
+            .HasMany(s => s.Instructors)
+            .WithMany(i => i.Subjects);
+        builder.Entity<Subject>()
+            .HasMany(s => s.Students)
+            .WithMany(s => s.Subjects);
     }
 }
