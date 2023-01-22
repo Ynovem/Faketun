@@ -24,6 +24,7 @@ dotnet tool install --global dotnet-ef --version 6.0.13
 
 # db-migrations
 dotnet ef migrations add Init
+dotnet ef database update
 
 # useful links
 https://learn.microsoft.com/en-us/ef/core/modeling/relationships?tabs=fluent-api%2Cfluent-api-simple-key%2Csimple-key

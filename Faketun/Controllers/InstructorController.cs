@@ -1,3 +1,5 @@
+using Faketun.DTO.Instructor;
+using Faketun.DTO.Subject;
 using Faketun.Models;
 using Faketun.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +9,7 @@ namespace Faketun.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InstructorController
+public class InstructorController: ControllerBase
 {
     private UnitOfWork _unitOfWork = new UnitOfWork();
 
@@ -27,11 +29,24 @@ public class InstructorController
     }
 
     [HttpGet("{id}/subjects/{semesterid}")]
-    public IEnumerable<Subject>? Subjects(int id, int semesterid)
+    public IEnumerable<SubjectDto>? Subjects(int id, int semesterid)
     {
         return _unitOfWork.SubjectRepository?.GetAll()
             .Where(s => s.Semester.Id.Equals(semesterid))
             .Where(s => s.Instructors.Any(i => i.Id.Equals(id)))
-            .ToList();
+            .ToList()
+            .ConvertAll(s => new SubjectDto(s));
+    }
+
+    [HttpPost]
+    public IActionResult Create([FromBody] NewInstructorDto newNewInstructorDto)
+    {
+        _unitOfWork.InstructorRepository?.Create(new Instructor
+        {
+            Email = newNewInstructorDto.Email,
+            Name = newNewInstructorDto.Name,
+            Neptun = newNewInstructorDto.Neptun,
+        });
+        return Ok();
     }
 }

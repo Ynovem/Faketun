@@ -1,15 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Faketun.Models;
 
-public class Semester: IEntity
+public class NewSemesterDto
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    [Display(Name = "ID")]
-    public int Id { get; set; }
-
     public string Name { get; set; } = String.Empty;
 
     [DataType(DataType.Date)]
@@ -17,6 +11,4 @@ public class Semester: IEntity
 
     [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
-    
-    public List<Subject> Subjects { get; set; }
 }
