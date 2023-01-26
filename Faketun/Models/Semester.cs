@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,6 +11,9 @@ public class Semester: IEntity
     [Display(Name = "ID")]
     public int Id { get; set; }
 
+    [DefaultValue(false)]
+    public bool Deleted { get; set; }
+
     public string Name { get; set; } = String.Empty;
 
     [DataType(DataType.Date)]
@@ -17,6 +21,6 @@ public class Semester: IEntity
 
     [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
-    
+
     public List<Subject> Subjects { get; set; }
 }

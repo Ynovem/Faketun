@@ -1,5 +1,6 @@
 using Faketun.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Faketun.Repositories;
 
@@ -12,9 +13,9 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         _db = db;
     }
 
-    public IQueryable<TEntity> GetAll()
+    public IQueryable<TEntity> GetAll(bool deleted)
     {
-        return _db.Set<TEntity>().AsNoTracking();
+        return _db.Set<TEntity>().IgnoreQueryFilters().AsNoTracking().IgnoreQueryFilters().Where(i => i.Deleted == deleted);
     }
 
     public TEntity GetById(int id)
@@ -27,22 +28,35 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEnt
         return await _db.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
     }
 
-    public async Task Create(TEntity entity)
+    public async Task<bool> Create(TEntity entity)
     {
         await _db.Set<TEntity>().AddAsync(entity);
-        await _db.SaveChangesAsync();
+        return await _db.SaveChangesAsync() > 0;
     }
 
-    public async Task Update(int id, TEntity entity)
+    public async Task<bool> Update(int id, TEntity entity)
     {
         _db.Set<TEntity>().Update(entity);
-        await _db.SaveChangesAsync();
+        return await _db.SaveChangesAsync() > 0;
     }
 
-    public async Task Delete(int id)
+    public async Task<bool> Delete(int id)
     {
         var entity = await GetByIdAsync(id);
         _db.Set<TEntity>().Remove(entity);
-        await _db.SaveChangesAsync();
+        return await _db.SaveChangesAsync() > 0;
+    }
+    public async Task<bool> LogicalDelete(int id)
+    {
+        var entity = _db.Set<TEntity>().IgnoreQueryFilters().AsNoTracking().IgnoreQueryFilters().FirstOrDefault(e => e.Id == id);
+        if (entity == null)
+        {
+            return false;
+        }
+
+        entity.Deleted = true;
+        _db.Set<TEntity>().Update(entity);
+        var r = await _db.SaveChangesAsync();
+        return r > 0;
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Faketun.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Faketun.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20230125191210_AddLogicalDelete")]
+    partial class AddLogicalDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
@@ -82,21 +85,6 @@ namespace Faketun.Migrations
                     b.HasIndex("PositionId");
 
                     b.ToTable("Instructors");
-                });
-
-            modelBuilder.Entity("Faketun.Models.InstructorSubject", b =>
-                {
-                    b.Property<int>("InstructorId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("InstructorId", "SubjectId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.ToTable("InstructorSubject");
                 });
 
             modelBuilder.Entity("Faketun.Models.Position", b =>
@@ -207,6 +195,21 @@ namespace Faketun.Migrations
                     b.ToTable("Subjects");
                 });
 
+            modelBuilder.Entity("InstructorSubject", b =>
+                {
+                    b.Property<int>("InstructorsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SubjectsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("InstructorsId", "SubjectsId");
+
+                    b.HasIndex("SubjectsId");
+
+                    b.ToTable("InstructorSubject");
+                });
+
             modelBuilder.Entity("StudentSubject", b =>
                 {
                     b.Property<int>("StudentsId")
@@ -231,25 +234,6 @@ namespace Faketun.Migrations
                         .IsRequired();
 
                     b.Navigation("Position");
-                });
-
-            modelBuilder.Entity("Faketun.Models.InstructorSubject", b =>
-                {
-                    b.HasOne("Faketun.Models.Instructor", "Instructor")
-                        .WithMany("Subjects")
-                        .HasForeignKey("InstructorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Faketun.Models.Subject", "Subject")
-                        .WithMany("Instructors")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Instructor");
-
-                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("Faketun.Models.Student", b =>
@@ -282,6 +266,21 @@ namespace Faketun.Migrations
                     b.Navigation("Semester");
                 });
 
+            modelBuilder.Entity("InstructorSubject", b =>
+                {
+                    b.HasOne("Faketun.Models.Instructor", null)
+                        .WithMany()
+                        .HasForeignKey("InstructorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Faketun.Models.Subject", null)
+                        .WithMany()
+                        .HasForeignKey("SubjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("StudentSubject", b =>
                 {
                     b.HasOne("Faketun.Models.Student", null)
@@ -307,11 +306,6 @@ namespace Faketun.Migrations
                     b.Navigation("Subjects");
                 });
 
-            modelBuilder.Entity("Faketun.Models.Instructor", b =>
-                {
-                    b.Navigation("Subjects");
-                });
-
             modelBuilder.Entity("Faketun.Models.Position", b =>
                 {
                     b.Navigation("Instructors");
@@ -320,11 +314,6 @@ namespace Faketun.Migrations
             modelBuilder.Entity("Faketun.Models.Semester", b =>
                 {
                     b.Navigation("Subjects");
-                });
-
-            modelBuilder.Entity("Faketun.Models.Subject", b =>
-                {
-                    b.Navigation("Instructors");
                 });
 #pragma warning restore 612, 618
         }

@@ -116,8 +116,6 @@ public class Program
                         Name = "Subject 1",
                         Code = "Subj#1",
                         Credit = 1,
-                        Instructors = new List<Instructor>{},
-                        Students = new List<Student>{},
                     },
                     new Subject
                     {
@@ -126,8 +124,6 @@ public class Program
                         Name = "Subject 2",
                         Code = "Subj#2",
                         Credit = 2,
-                        Instructors = new List<Instructor>{instructors[0]},
-                        Students = new List<Student>{students[0]},
                     },
                     new Subject
                     {
@@ -136,8 +132,6 @@ public class Program
                         Name = "Subject 3",
                         Code = "Subj#3",
                         Credit = 3,
-                        Instructors = new List<Instructor>{instructors[1]},
-                        Students = new List<Student>{students[1]},
                     },
                     new Subject
                     {
@@ -146,8 +140,26 @@ public class Program
                         Name = "Subject 4",
                         Code = "Subj#4",
                         Credit = 4,
-                        Instructors = new List<Instructor>{instructors[0], instructors[1]},
-                        Students = new List<Student>{students[0], students[1]},
+                    },
+                });
+                db.SaveChanges();
+
+                db.InstructorSubject.AddRange(new List<InstructorSubject>{
+                    new InstructorSubject{
+                        InstructorId = 1,
+                        SubjectId = 1,
+                    },
+                    new InstructorSubject{
+                        InstructorId = 1,
+                        SubjectId = 2,
+                    },
+                    new InstructorSubject{
+                        InstructorId = 2,
+                        SubjectId = 3,
+                    },
+                    new InstructorSubject{
+                        InstructorId = 2,
+                        SubjectId = 4,
                     },
                 });
                 db.SaveChanges();

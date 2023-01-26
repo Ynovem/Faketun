@@ -11,6 +11,9 @@ public class UnitOfWork: IDisposable
     private SemesterRepository? _semesterRepository;
     private StudentRepository? _studentRepository;
     private SubjectRepository? _subjectRepository;
+    private PositionRepository? _positionRepository;
+    private CourseRepository? _courseRepository;
+    private InstructorSubjectRepository? _instructorSubjectRepository;
 
     public InstructorRepository? InstructorRepository
     {
@@ -30,6 +33,21 @@ public class UnitOfWork: IDisposable
     public SubjectRepository? SubjectRepository
     {
         get { return _subjectRepository ??= new SubjectRepository(_db); }
+    }
+
+    public PositionRepository? PositionRepository
+    {
+        get { return _positionRepository ??= new PositionRepository(_db); }
+    }
+
+    public CourseRepository? CourseRepository
+    {
+        get { return _courseRepository ??= new CourseRepository(_db); }
+    }
+
+    public InstructorSubjectRepository? InstructorSubjectRepository
+    {
+        get { return _instructorSubjectRepository ??= new InstructorSubjectRepository(_db); }
     }
 
     public int Save()

@@ -14,39 +14,112 @@ public class InstructorController: ControllerBase
     private UnitOfWork _unitOfWork = new UnitOfWork();
 
     [HttpGet]
-    public IEnumerable<Instructor>? Get()
+    public IEnumerable<Instructor>? Read([FromQuery] bool deleted = false)
     {
-        return _unitOfWork.InstructorRepository?.GetAll().ToList();
+        return _unitOfWork.InstructorRepository?.GetAll(deleted).ToList();
     }
 
     [HttpGet("{id}")]
-    public Instructor? Get(int id)
+    public Instructor? Read(int id, [FromQuery] bool deleted = false)
     {
-        return _unitOfWork.InstructorRepository?.GetAll()
+        return _unitOfWork.InstructorRepository?.GetAll(deleted)
             .Where(i => i.Id == id)
             .Include(i => i.Position)
             .First();
     }
 
+    [HttpPost]
+    public IActionResult Create([FromBody] NewInstructorDto dto)
+    {
+        Position? position = _unitOfWork.PositionRepository?.GetById(dto.PositionId);
+        if (position == null)
+        {
+            return BadRequest();
+        }
+
+        var result = _unitOfWork.InstructorRepository?.Create(new Instructor
+        {
+            Email = dto.Email,
+            Name = dto.Name,
+            Neptun = dto.Neptun,
+            PositionId = dto.PositionId
+        });
+
+        if (result == null || result.Result == false)
+        {
+            return BadRequest();
+        }
+
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(int id, [FromBody] UpdateInstructorDto dto)
+    {
+        Instructor? instructor = _unitOfWork.InstructorRepository?.GetById(id);
+        if (instructor == null)
+        {
+            return NotFound();
+        }
+
+        instructor.Email = dto.Email ?? instructor.Email;
+        instructor.Name = dto.Name ?? instructor.Name;
+        instructor.Neptun = dto.Neptun ?? instructor.Neptun;
+        instructor.PositionId = dto.PositionId ?? instructor.PositionId;
+
+        var result = _unitOfWork.InstructorRepository?.Update(id, instructor);
+        if (result == null || result.Result == false)
+        {
+            return BadRequest();
+        }
+
+        return Ok();
+    }
+
+    [HttpPut("{id}/subject/{subjectid}")]
+    public IActionResult addSubject(int id, int subjectid)
+    {
+        var result = _unitOfWork.InstructorSubjectRepository?.Assign(id, subjectid);
+        if (result == null || result.Result == false)
+        {
+            return Conflict();
+        }
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}/subject/{subjectid}")]
+    public IActionResult removeSubject(int id, int subjectid)
+    {
+        var result = _unitOfWork.InstructorSubjectRepository?.Unassign(id, subjectid);
+        if (result == null || result.Result == false)
+        {
+            return Conflict();
+        }
+
+        return Ok();
+    }
+
     [HttpGet("{id}/subjects/{semesterid}")]
     public IEnumerable<SubjectDto>? Subjects(int id, int semesterid)
     {
-        return _unitOfWork.SubjectRepository?.GetAll()
-            .Where(s => s.Semester.Id.Equals(semesterid))
-            .Where(s => s.Instructors.Any(i => i.Id.Equals(id)))
+        return _unitOfWork.InstructorSubjectRepository?.GetAll()
+            .Where(i => i.InstructorId == id)
+            .Include(i => i.Subject)
+            .Where(i  => i.Subject.SemesterId == semesterid)
             .ToList()
-            .ConvertAll(s => new SubjectDto(s));
+            .ConvertAll(s => new SubjectDto(s.Subject));
     }
 
-    [HttpPost]
-    public IActionResult Create([FromBody] NewInstructorDto newNewInstructorDto)
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
     {
-        _unitOfWork.InstructorRepository?.Create(new Instructor
+        var result = _unitOfWork.InstructorRepository?.LogicalDelete(id);
+        if (result == null || result.Result == false)
         {
-            Email = newNewInstructorDto.Email,
-            Name = newNewInstructorDto.Name,
-            Neptun = newNewInstructorDto.Neptun,
-        });
+            return NotFound();
+        }
+
         return Ok();
     }
 }

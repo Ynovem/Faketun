@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,6 +10,9 @@ public class Position: IEntity
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Display(Name = "ID")]
     public int Id { get; set; }
+
+    [DefaultValue(false)]
+    public bool Deleted { get; set; }
 
     public string Name { get; set; } = String.Empty;
 

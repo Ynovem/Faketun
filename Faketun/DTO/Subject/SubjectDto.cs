@@ -8,6 +8,7 @@ public class SubjectDto
         Name = subject.Name;
         Code = subject.Code;
         Credit = subject.Credit;
+        Console.Write(subject.SemesterId);
     }
     public int Id { get; set; }
     public string Name { get; set; }
